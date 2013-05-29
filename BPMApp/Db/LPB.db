@@ -1,0 +1,8 @@
+record(bi,"BPM:FRONTEND$(Number):read:switch"){
+	field(DTYP,"LPCBi")
+	field(DESC,"switch attenuator signal")
+	field(SCAN,"$(SCAN=0.1 second)")
+	field(INP,"$Number")
+	field(ESLO,1e-9)
+	field(EOFF,-1)
+}

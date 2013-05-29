@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <pthread.h>
+#include "pcbnAPI.h"
+#include "epicsTCP.h"
+#include "epicsMutex.h"
+
+#define LPCPORT 6791
+#define READ_OP 0
+#define WRITE_OP 1
+
+enum operation {
+	OP_READ_BI,
+	OP_READ_AI,
+	OP_WRITE_BO,
+	OP_WRITE_AO
+};
+
+int epics_TCP_connect(int sock, int instrument_id);
+int epics_TCP_get(int sock,epicsUInt8 *buf, int instrument_id, int variable);
