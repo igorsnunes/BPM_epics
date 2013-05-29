@@ -6,8 +6,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <pthread.h>
-#include "pcbnAPI.h"
-#include "epicsTCP.h"
+#include "../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.h"
 #include "epicsMutex.h"
 
 #define LPCPORT 6791
@@ -21,5 +20,6 @@ enum operation {
 	OP_WRITE_AO
 };
 
-int epics_TCP_connect(int sock, int instrument_id);
-int epics_TCP_get(int sock,epicsUInt8 *buf, int instrument_id, int variable);
+int epics_TCP_connect(int instrument_id);
+
+int epics_TCP_do(int sock, epicsUInt8 *buf, int instrument_id, int variable, enum operation){

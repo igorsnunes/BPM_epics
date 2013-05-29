@@ -26,6 +26,7 @@ BPM_DBD += LPCdev.dbd
 BPM_SRCS += BPM_registerRecordDeviceDriver.cpp
 BPM_SRCS += devLPCAi.c
 BPM_SRCS += epicsTCP.c
+BPM_SRCS += ../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.c
 
 # Build the main IOC entry point on workstation OSs.
 BPM_SRCS_DEFAULT += BPMMain.cpp
@@ -36,7 +37,6 @@ BPM_SRCS_vxWorks += -nil-
 
 # Finally link to the EPICS Base libraries
 BPM_LIBS += $(EPICS_BASE_IOC_LIBS)
-
 #===========================
 
 include $(TOP)/configure/RULES

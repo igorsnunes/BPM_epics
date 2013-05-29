@@ -1,1 +1,1 @@
-device(bi,INST_IO,devLPVBi,"LPCBi")
+device(bi,INST_IO,devLPCBi,"LPCBi")

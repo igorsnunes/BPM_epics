@@ -140,7 +140,7 @@ epicsShareExtern dset *pvar_dset_devAoSoftRaw;
 epicsShareExtern dset *pvar_dset_devAoSoftCallback;
 epicsShareExtern dset *pvar_dset_devBiSoft;
 epicsShareExtern dset *pvar_dset_devBiSoftRaw;
-epicsShareExtern dset *pvar_dset_devLPVBi;
+epicsShareExtern dset *pvar_dset_devLPCBi;
 epicsShareExtern dset *pvar_dset_devBoSoft;
 epicsShareExtern dset *pvar_dset_devBoSoftRaw;
 epicsShareExtern dset *pvar_dset_devBoSoftCallback;
@@ -183,7 +183,7 @@ static const char * const deviceSupportNames[41] = {
     "devAoSoftCallback",
     "devBiSoft",
     "devBiSoftRaw",
-    "devLPVBi",
+    "devLPCBi",
     "devBoSoft",
     "devBoSoftRaw",
     "devBoSoftCallback",
@@ -227,7 +227,7 @@ static const dset * const devsl[41] = {
     pvar_dset_devAoSoftCallback,
     pvar_dset_devBiSoft,
     pvar_dset_devBiSoftRaw,
-    pvar_dset_devLPVBi,
+    pvar_dset_devLPCBi,
     pvar_dset_devBoSoft,
     pvar_dset_devBoSoftRaw,
     pvar_dset_devBoSoftCallback,

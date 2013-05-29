@@ -30,10 +30,10 @@ static int check_status_ok(int sock){
 }
 
 //estabilish connection with ethernet device
-int epics_TCP_connect(int sock, int instrument_id){
+int epics_TCP_connect(int instrument_id){
 	int rc;
 	struct sockaddr_in servaddr;
-
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(LPCPORT);
