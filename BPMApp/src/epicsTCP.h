@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <pthread.h>
-#include "../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.h"
+#include "submodules/pcbnAPI.h"
 #include "epicsMutex.h"
 
 #include <epicsStdio.h>

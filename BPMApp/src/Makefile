@@ -26,7 +26,12 @@ BPM_DBD += LPCdev.dbd
 BPM_SRCS += BPM_registerRecordDeviceDriver.cpp
 BPM_SRCS += devLPCBi.c
 BPM_SRCS += epicsTCP.c
-BPM_SRCS += ../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.c
+#BPM_SRCS += pcbnAPI.c
+
+#BPM_LIBS += submodules/pcbnAPI.h
+BPM_LIBS += pcbn
+
+pcbn_DIR = $(TOP)/BPMApp/src/submodules
 
 # Build the main IOC entry point on workstation OSs.
 BPM_SRCS_DEFAULT += BPMMain.cpp
@@ -42,4 +47,9 @@ BPM_LIBS += $(EPICS_BASE_IOC_LIBS)
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD RULES AFTER THIS LINE
+
+#.PHONY: libs
+
+$(TOP)/BPMApp/src/submodules/libpcbn.a: 
+	make -C $(TOP)/BPMApp/src/submodules all
 

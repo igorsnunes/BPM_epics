@@ -1,5 +1,4 @@
-epicsTCP.o: ../epicsTCP.c ../epicsTCP.h \
- ../../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.h \
+epicsTCP.o: ../epicsTCP.c ../epicsTCP.h ../submodules/pcbnAPI.h \
  /home/igor/epics/base/include/epicsMutex.h \
  /home/igor/epics/base/include/epicsAssert.h \
  /home/igor/epics/base/include/shareLib.h \

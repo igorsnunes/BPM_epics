@@ -23,9 +23,8 @@ devLPCBi.o: ../devLPCBi.c /home/igor/epics/base/include/epicsExport.h \
  /home/igor/epics/base/include/db_field_log.h \
  /home/igor/epics/base/include/devSup.h \
  /home/igor/epics/base/include/recGbl.h \
- /home/igor/epics/base/include/biRecord.h \
- ../../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.h \
- ../epicsTCP.h /home/igor/epics/base/include/epicsMutex.h \
+ /home/igor/epics/base/include/biRecord.h ../epicsTCP.h \
+ ../submodules/pcbnAPI.h /home/igor/epics/base/include/epicsMutex.h \
  /home/igor/epics/base/include/epicsStdio.h \
  /home/igor/epics/base/include/compilerDependencies.h \
  /home/igor/epics/base/include/epicsStdlib.h \

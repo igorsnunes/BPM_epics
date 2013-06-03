@@ -6,8 +6,6 @@
 #include <recGbl.h>
 #include <biRecord.h>
 #include <stdlib.h>
-
-//#include "../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.h"
 #include "epicsTCP.h"
 
 
