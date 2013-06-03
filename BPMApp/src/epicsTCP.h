@@ -9,6 +9,15 @@
 #include "../../Api-para-Protocolo-de-Controle-de-Baixo-n-vel/pcbnAPI.h"
 #include "epicsMutex.h"
 
+#include <epicsStdio.h>
+#include <epicsStdlib.h>
+#include <epicsString.h>
+#include <epicsExport.h>
+#include <epicsMutex.h>
+#include <drvSup.h>
+#include <iocsh.h>
+
+
 #define LPCPORT 6791
 #define READ_OP 0
 #define WRITE_OP 1
@@ -22,4 +31,4 @@ enum operation {
 
 int epics_TCP_connect(int instrument_id);
 
-int epics_TCP_do(int sock, epicsUInt8 *buf, int instrument_id, int variable, enum operation){
+int epics_TCP_do(int sock, epicsUInt8 *buf, int instrument_id, int variable, enum operation op);
