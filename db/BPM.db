@@ -1,0 +1,6 @@
+record(bi, "BPM:FRONTEND$(number):read:switch"){
+	field(DTYP,"LPCBi")
+	field(DESC,"switch")
+	field(SCAN,"$(SCAN=1 second)")
+	field(INP,"$(number)")
+}

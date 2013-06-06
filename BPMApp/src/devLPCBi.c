@@ -13,6 +13,7 @@ static long init_record_bi(biRecord *record);
 static long read_bi(biRecord *record);
 
 struct LPCState {
+	int status;
 	int sock;
 	unsigned long instr_id;
 };
@@ -35,30 +36,48 @@ struct {
 epicsExportAddress(dset,devLPCBi);
 
 static long init_record_bi(biRecord *pao){
+	int sock = 0;
 	struct LPCState *priv;
-
-	priv=malloc(sizeof(struct LPCState));
-	if(!priv){
-		recGblRecordError(S_db_noMemory, (void*)pao, "devBiTimebase failed to allocate private struct");
+	printf("STARTEI\n");
+	priv=malloc(sizeof (*priv) );
+	if(!priv)
 		return S_db_noMemory;
-	}
+
 	int instrument_id;
 	if(sscanf(pao->inp.value.instio.string, "%d", &instrument_id)!=1)
 		return S_db_errArg;
-
 	
-	priv->sock = epics_TCP_connect(instrument_id);
+	printf("instrument_id: %d\n",instrument_id);
+	
+	if (epics_TCP_connect(instrument_id,&sock,1)==0){
+		printf("wut?\n");
+		priv->status = 0;
+		pao->dpvt = priv;
+		return S_dev_noDeviceFound;
+	}else {
+		printf("sock: %d\n",sock);
+		priv->status = 1;
+		priv->sock = sock; 
+	}
+
 	priv->instr_id = instrument_id;
 	pao->dpvt = priv;
-	
 	return 0;
 }
 
 static long read_bi(biRecord *pao){
 	struct LPCState *priv = pao->dpvt;
-	int status;
-	epicsUInt8 buf;
-	status = epics_TCP_do(priv->sock,&buf,priv->instr_id,0,OP_READ_BI);
-	
+	epicsUInt8 **buf = NULL;
+	if (priv->status){
+		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,0,OP_READ_BI);
+		if (priv->status){
+			printf("buf int?: %d\n", buf[0]);
+			pao->rval = buf[0];
+		}
+		if (!buf)
+			free(buf);
+	} else
+		priv->status = epics_TCP_connect(priv->instr_id,&priv->sock,0);
+
 	return 0;
 }

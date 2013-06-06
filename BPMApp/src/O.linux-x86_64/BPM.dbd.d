@@ -1,7 +1,7 @@
 # DO NOT EDIT: This file created by mkmf.pl,v 1.5 2002/03/25 21:33:24 jba Exp $ 
 
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/base.dbd
-../O.Common/BPM.dbd : ../LPCdev.dbd
+../O.Common/BPM.dbd : ../BPMdev.dbd
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/menuGlobal.dbd
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/menuConvert.dbd
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/aaiRecord.dbd

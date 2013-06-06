@@ -14,7 +14,7 @@ DBD += BPM.dbd
 
 # BPM.dbd will be made up from these files:
 BPM_DBD += base.dbd
-BPM_DBD += LPCdev.dbd
+BPM_DBD += BPMdev.dbd
 
 # Include dbd files from all support applications:
 #BPM_DBD += xxx.dbd

@@ -29,6 +29,5 @@ enum operation {
 	OP_WRITE_AO
 };
 
-int epics_TCP_connect(int instrument_id);
-
-int epics_TCP_do(int sock, epicsUInt8 *buf, int instrument_id, int variable, enum operation op);
+int epics_TCP_connect(int instrument_id, int *sock,int mut);
+int epics_TCP_do(int sock, epicsUInt8 **buf, int instrument_id, int variable, enum operation op);
