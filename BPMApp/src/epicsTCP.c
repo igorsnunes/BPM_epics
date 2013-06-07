@@ -39,10 +39,12 @@ int epics_TCP_connect(int instrument_id, int *sock, int mut){
 	servaddr.sin_port = htons(LPCPORT);
 	//TODO:implement getting ip from system call using instrument id
 	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	//servaddr.sin_addr.s_addr = inet_addr("10.0.17.201");
 	
 	if (mut)
 		mutex = epicsMutexCreate();
 	
+	epicsMutexLock(mutex);
 	if ((sock[0] = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		perror("epics_TCP_connect:socket failed");
 		return 0;
@@ -58,6 +60,7 @@ int epics_TCP_connect(int instrument_id, int *sock, int mut){
 		return 0;
 	}
 	
+	epicsMutexUnlock(mutex);
 	return 1;
 }
 

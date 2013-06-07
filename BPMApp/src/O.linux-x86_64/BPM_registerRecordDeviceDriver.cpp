@@ -273,7 +273,7 @@ static struct iocshVarDef vardefs[] = {
 
 int BPM_registerRecordDeviceDriver(DBBASE *pbase)
 {
-    const char *bldTop = "/home/igor/IOCtest/BPM_t";
+    const char *bldTop = "/home/igor/IOCtest/BPM_epics";
     const char *envTop = getenv("TOP");
 
     if (envTop && strcmp(envTop, bldTop)) {

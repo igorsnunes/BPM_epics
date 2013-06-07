@@ -1,4 +1,4 @@
 epicsEnvSet("ARCH","linux-x86_64")
-epicsEnvSet("IOC","iocBPM1")
+epicsEnvSet("IOC","iocBPM")
 epicsEnvSet("TOP","/home/igor/IOCtest/BPM_epics")
 epicsEnvSet("EPICS_BASE","/home/igor/epics/base")
