@@ -86,8 +86,6 @@ static int get_bi(int sock, epicsUInt8 **buf, int instrument_id, int variable){
 	int size,ret_val;
 	size=var_read_command_ask(&ask);	
 	ask.p[0]=(unsigned char)variable;
-	//TODO:not the best way to treat this race condition
-	//TODO:treat errors correctly
 
 	ret_val = comm_talk(sock,ask,size,&answer);
 	*buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*answer.size);
@@ -95,6 +93,18 @@ static int get_bi(int sock, epicsUInt8 **buf, int instrument_id, int variable){
 	return ret_val;
 	
 }
+static int get_bo(int sock, epicsUInt8 **buf, int instrument_id, int variables){
+	command_header ask,answer;
+	int  size, ret_val;
+	variables = 1;
+	size = var_write_command_ask(&ask,1);
+	ask.p[0] = (unsigned char)variables;
+	ask.p[1] = (unsigned char)*buf[0];
+	
+	ret_val = comm_talk(sock,ask,size,&answer);
+	return ret_val;
+}
+
 static int get_operation(int sock, epicsUInt8 **buf, int instrument_id, int variable,enum operation op){
 	
 	switch(op){
@@ -104,6 +114,7 @@ static int get_operation(int sock, epicsUInt8 **buf, int instrument_id, int vari
 		case OP_READ_AI:
 			break;
 		case OP_WRITE_BO:
+			return get_bo(sock,buf,instrument_id,variable);	
 			break;
 		case OP_WRITE_AO:
 			break;

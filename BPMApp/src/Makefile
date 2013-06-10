@@ -25,6 +25,7 @@ BPM_DBD += BPMdev.dbd
 # BPM_registerRecordDeviceDriver.cpp derives from BPM.dbd
 BPM_SRCS += BPM_registerRecordDeviceDriver.cpp
 BPM_SRCS += devLPCBi.c
+BPM_SRCS += devLPCBo.c
 BPM_SRCS += epicsTCP.c
 #BPM_SRCS += pcbnAPI.c
 

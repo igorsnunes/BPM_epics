@@ -145,6 +145,7 @@ epicsShareExtern dset *pvar_dset_devBoSoft;
 epicsShareExtern dset *pvar_dset_devBoSoftRaw;
 epicsShareExtern dset *pvar_dset_devBoSoftCallback;
 epicsShareExtern dset *pvar_dset_devBoGeneralTime;
+epicsShareExtern dset *pvar_dset_devLPCBo;
 epicsShareExtern dset *pvar_dset_devCalcoutSoft;
 epicsShareExtern dset *pvar_dset_devCalcoutSoftCallback;
 epicsShareExtern dset *pvar_dset_devEventSoft;
@@ -171,7 +172,7 @@ epicsShareExtern dset *pvar_dset_devSoStdio;
 epicsShareExtern dset *pvar_dset_devSASoft;
 epicsShareExtern dset *pvar_dset_devWfSoft;
 
-static const char * const deviceSupportNames[41] = {
+static const char * const deviceSupportNames[42] = {
     "devAaiSoft",
     "devAaoSoft",
     "devAiSoft",
@@ -188,6 +189,7 @@ static const char * const deviceSupportNames[41] = {
     "devBoSoftRaw",
     "devBoSoftCallback",
     "devBoGeneralTime",
+    "devLPCBo",
     "devCalcoutSoft",
     "devCalcoutSoftCallback",
     "devEventSoft",
@@ -215,7 +217,7 @@ static const char * const deviceSupportNames[41] = {
     "devWfSoft"
 };
 
-static const dset * const devsl[41] = {
+static const dset * const devsl[42] = {
     pvar_dset_devAaiSoft,
     pvar_dset_devAaoSoft,
     pvar_dset_devAiSoft,
@@ -232,6 +234,7 @@ static const dset * const devsl[41] = {
     pvar_dset_devBoSoftRaw,
     pvar_dset_devBoSoftCallback,
     pvar_dset_devBoGeneralTime,
+    pvar_dset_devLPCBo,
     pvar_dset_devCalcoutSoft,
     pvar_dset_devCalcoutSoftCallback,
     pvar_dset_devEventSoft,
@@ -288,7 +291,7 @@ int BPM_registerRecordDeviceDriver(DBBASE *pbase)
     }
 
     registerRecordTypes(pbase, 28, recordTypeNames, rtl);
-    registerDevices(pbase, 41, deviceSupportNames, devsl);
+    registerDevices(pbase, 42, deviceSupportNames, devsl);
     (*pvar_func_asSub)();
     iocshRegisterVariable(vardefs);
     return 0;

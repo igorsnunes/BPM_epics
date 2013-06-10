@@ -1,1 +1,2 @@
 device(bi,INST_IO,devLPCBi,"LPCBi")
+device(bo,INST_IO,devLPCBo,"LPCBo")
