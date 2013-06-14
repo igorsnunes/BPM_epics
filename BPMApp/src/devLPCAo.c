@@ -4,7 +4,7 @@
 #include <dbAccess.h>
 #include <devSup.h>
 #include <recGbl.h>
-#include <aiRecord.h>
+#include <aoRecord.h>
 #include <stdlib.h>
 #include "epicsTCP.h"
 
@@ -13,8 +13,8 @@ typedef union {
 	float f;
 } u;
 	
-static long init_record_ai(aiRecord *record);
-static long read_ai(aiRecord *record);
+static long init_record_ao(aoRecord *record);
+static long write_ao(aoRecord *record);
 
 struct LPCState {
 	int status;
@@ -26,21 +26,20 @@ struct {
 	long num;
 	DEVSUPFUN report;
 	DEVSUPFUN init;
-	DEVSUPFUN init_record_ai;
+	DEVSUPFUN init_record_ao;
 	DEVSUPFUN get_ioint_info;
-	DEVSUPFUN read_ai;
-} devLPCAi = {
-	6,
+	DEVSUPFUN write_ao;
+} devLPCAo = {
+	5,
 	NULL,
 	NULL,
-	init_record_ai,
+	init_record_ao,
 	NULL,
-	read_ai,
-	NULL
+	write_ao,
 };
-epicsExportAddress(dset, devLPCAi);
+epicsExportAddress(dset, devLPCAo);
 
-static long init_record_ai(aiRecord *pao){
+static long init_record_ao(aoRecord *pao){
 	int sock = 0;
 	struct LPCState *priv;
 	priv=malloc(sizeof (*priv) );
@@ -48,7 +47,7 @@ static long init_record_ai(aiRecord *pao){
 		return S_db_noMemory;
 
 	int instrument_id;
-	if(sscanf(pao->inp.value.instio.string, "%d", &instrument_id)!=1)
+	if(sscanf(pao->out.value.instio.string, "%d", &instrument_id)!=1)
 		return S_db_errArg;
 	
 	printf("instrument_id: %d\n",instrument_id);
@@ -67,25 +66,24 @@ static long init_record_ai(aiRecord *pao){
 	return 0;
 }
 
-static long read_ai(aiRecord *pao){
+static long write_ao(aoRecord *pao){
 	struct LPCState *priv = pao->dpvt;
 	u rval;
 	epicsUInt8 *buff = NULL;
 	if (priv->status){
-		printf("before do\n");
+		buff = (epicsUInt8*)malloc(sizeof(epicsUInt8)*1);
+		rval.f = (float)pao->rval;
+		printf("float value:%f\n", rval.f);
+		buff[0] = rval.c[0];
+		buff[1] = rval.c[1];
+		buff[2] = rval.c[2];
+		buff[3] = rval.c[3];
 		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,1,OP_READ_AI);
-		printf("after do\n");
-		if (priv->status){
-			rval.c[0] = buff[0];
-			rval.c[1] = buff[1];
-			rval.c[2] = buff[2];
-			rval.c[3] = buff[3];
-			printf("float value:%f\n", rval.f);
-			pao->rval = rval.f;
-		}
+	
 		if (buff)
 			free(buff);
-	} else
+	}
+	 else
 		priv->status = epics_TCP_connect(priv->instr_id,&priv->sock,0);
 
 	return 0;

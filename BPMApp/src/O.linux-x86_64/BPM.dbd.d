@@ -2,6 +2,7 @@
 
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/base.dbd
 ../O.Common/BPM.dbd : ../BPMdev.dbd
+../O.Common/BPM.dbd : ../LPC.dbd
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/menuGlobal.dbd
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/menuConvert.dbd
 ../O.Common/BPM.dbd : /home/igor/epics/base/dbd/aaiRecord.dbd

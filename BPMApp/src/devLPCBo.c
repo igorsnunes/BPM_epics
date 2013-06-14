@@ -67,10 +67,11 @@ static long init_record_bo(boRecord *pao){
 
 static long write_bo(boRecord *pao){
 	struct LPCState *priv = pao->dpvt;
-	epicsUInt8 **buf = NULL;
+	epicsUInt8 *buf = NULL;
 	if (priv->status){
-		*buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*1);
-		*buf[0] = pao->rval;
+		buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*1);
+		buf[0] = pao->rval;
+		printf("buffer value: %d", buf[0]);
 		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,0,OP_WRITE_BO);
 		
 		if (buf)//TODO: check it!

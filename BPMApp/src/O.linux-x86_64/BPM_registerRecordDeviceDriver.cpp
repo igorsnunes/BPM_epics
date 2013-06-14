@@ -135,9 +135,11 @@ epicsShareExtern dset *pvar_dset_devAiSoft;
 epicsShareExtern dset *pvar_dset_devAiSoftRaw;
 epicsShareExtern dset *pvar_dset_devTimestampAI;
 epicsShareExtern dset *pvar_dset_devAiGeneralTime;
+epicsShareExtern dset *pvar_dset_devLPCAi;
 epicsShareExtern dset *pvar_dset_devAoSoft;
 epicsShareExtern dset *pvar_dset_devAoSoftRaw;
 epicsShareExtern dset *pvar_dset_devAoSoftCallback;
+epicsShareExtern dset *pvar_dset_devLPCAo;
 epicsShareExtern dset *pvar_dset_devBiSoft;
 epicsShareExtern dset *pvar_dset_devBiSoftRaw;
 epicsShareExtern dset *pvar_dset_devLPCBi;
@@ -172,16 +174,18 @@ epicsShareExtern dset *pvar_dset_devSoStdio;
 epicsShareExtern dset *pvar_dset_devSASoft;
 epicsShareExtern dset *pvar_dset_devWfSoft;
 
-static const char * const deviceSupportNames[42] = {
+static const char * const deviceSupportNames[44] = {
     "devAaiSoft",
     "devAaoSoft",
     "devAiSoft",
     "devAiSoftRaw",
     "devTimestampAI",
     "devAiGeneralTime",
+    "devLPCAi",
     "devAoSoft",
     "devAoSoftRaw",
     "devAoSoftCallback",
+    "devLPCAo",
     "devBiSoft",
     "devBiSoftRaw",
     "devLPCBi",
@@ -217,16 +221,18 @@ static const char * const deviceSupportNames[42] = {
     "devWfSoft"
 };
 
-static const dset * const devsl[42] = {
+static const dset * const devsl[44] = {
     pvar_dset_devAaiSoft,
     pvar_dset_devAaoSoft,
     pvar_dset_devAiSoft,
     pvar_dset_devAiSoftRaw,
     pvar_dset_devTimestampAI,
     pvar_dset_devAiGeneralTime,
+    pvar_dset_devLPCAi,
     pvar_dset_devAoSoft,
     pvar_dset_devAoSoftRaw,
     pvar_dset_devAoSoftCallback,
+    pvar_dset_devLPCAo,
     pvar_dset_devBiSoft,
     pvar_dset_devBiSoftRaw,
     pvar_dset_devLPCBi,
@@ -263,6 +269,7 @@ static const dset * const devsl[42] = {
 };
 
 epicsShareExtern void (*pvar_func_asSub)(void);
+epicsShareExtern void (*pvar_func_connRegister)(void);
 
 epicsShareExtern int *pvar_int_asCaDebug;
 epicsShareExtern int *pvar_int_dbRecordsOnceOnly;
@@ -291,8 +298,9 @@ int BPM_registerRecordDeviceDriver(DBBASE *pbase)
     }
 
     registerRecordTypes(pbase, 28, recordTypeNames, rtl);
-    registerDevices(pbase, 42, deviceSupportNames, devsl);
+    registerDevices(pbase, 44, deviceSupportNames, devsl);
     (*pvar_func_asSub)();
+    (*pvar_func_connRegister)();
     iocshRegisterVariable(vardefs);
     return 0;
 }

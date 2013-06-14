@@ -67,7 +67,7 @@ static long init_record_bi(biRecord *pao){
 
 static long read_bi(biRecord *pao){
 	struct LPCState *priv = pao->dpvt;
-	epicsUInt8 **buf = NULL;
+	epicsUInt8 *buf = NULL;
 	if (priv->status){
 		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,0,OP_READ_BI);
 		if (priv->status){

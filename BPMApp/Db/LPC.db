@@ -6,7 +6,6 @@ record(bi, "BPM:FRONTEND$(number):switch:read"){
 	field(SCAN,"$(SCAN=1 second)")
 	field(INP,"@$(number)")
 }
-
 record(bo, "BPM:FRONTEND$(number):switch:write"){
 	field(DTYP,"LPCBo")
 	field(DESC,"switch")
@@ -15,3 +14,25 @@ record(bo, "BPM:FRONTEND$(number):switch:write"){
 	field(SCAN,"Passive")
 	field(OUT,"@$(number)")
 }
+record(ai, "BPM:FRONTEND$(number):setpoint:read")
+{
+	field(DTYP, "LPCAi")
+	field(DESC, "Temperature setpoint")
+	field(SCAN, "1 second")
+	field(INP, "@$(number)")
+	field(PREC, "3")
+	field(EGU, "Celsius")
+	field(LINR, "NO CONVERSION")
+}
+record(ao, "BPM:FRONTEND$(number):setpoint:write")
+{
+	field(DTYP, "LPCAo")
+	field(DESC, "Temperature setpoint")
+	field(SCAN, "1 second")
+	field(INP, "@$(number)")
+	field(PREC, "3")
+	field(EGU, "Celsius")
+	field(LINR, "NO CONVERSION")
+}
+
+

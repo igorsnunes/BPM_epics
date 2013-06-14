@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netdb.h>
+#include <string.h>
 #include <pthread.h>
 #include "submodules/pcbnAPI.h"
 #include "epicsMutex.h"
@@ -22,6 +23,18 @@
 #define READ_OP 0
 #define WRITE_OP 1
 
+typedef struct node{
+	int sock;
+	int device_id;
+	epicsMutexId mutex;
+	struct node *next;
+}Node;
+
+typedef struct pnode{
+	int nnode;
+	struct node *first;
+}pNode;
+
 enum operation {
 	OP_READ_BI,
 	OP_READ_AI,
@@ -29,5 +42,6 @@ enum operation {
 	OP_WRITE_AO
 };
 
+int init_pNode(void);
 int epics_TCP_connect(int instrument_id, int *sock,int mut);
 int epics_TCP_do(int sock, epicsUInt8 **buf, int instrument_id, int variable, enum operation op);

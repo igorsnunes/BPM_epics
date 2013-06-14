@@ -9,14 +9,16 @@ cd ${TOP}
 
 ## Register all support components
 dbLoadDatabase "dbd/BPM.dbd"
-BPM_registerRecordDeviceDriver pdbbase
+BPM_registerRecordDeviceDriver(pdbbase)
+
+init_pNode
 
 ## Load record instances
 dbLoadRecords("db/LPC.db","user=igorHost,number=0")
-dbLoadRecords("db/LPC.db","user=igorHost,number=1")
-dbLoadRecords("db/LPC.db","user=igorHost,number=2")
-dbLoadRecords("db/LPC.db","user=igorHost,number=3")
-dbLoadRecords("db/LPC.db","user=igorHost,number=4")
+##dbLoadRecords("db/LPC.db","user=igorHost,number=1")
+##dbLoadRecords("db/LPC.db","user=igorHost,number=2")
+##dbLoadRecords("db/LPC.db","user=igorHost,number=3")
+##dbLoadRecords("db/LPC.db","user=igorHost,number=4")
 ##dbLoadRecords("db/LPC.db","user=igorHost,number=5")
 ##dbLoadRecords("db/LPC.db","user=igorHost,number=6")
 ##dbLoadRecords("db/LPC.db","user=igorHost,number=7")
