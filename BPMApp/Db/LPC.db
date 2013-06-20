@@ -18,7 +18,7 @@ record(ai, "BPM:FRONTEND$(number):setpoint:read")
 {
 	field(DTYP, "LPCAi")
 	field(DESC, "Temperature setpoint")
-	field(SCAN, "1 second")
+	field(SCAN,"$(SCAN=1 second)")
 	field(INP, "@$(number)")
 	field(PREC, "3")
 	field(EGU, "Celsius")
@@ -28,11 +28,13 @@ record(ao, "BPM:FRONTEND$(number):setpoint:write")
 {
 	field(DTYP, "LPCAo")
 	field(DESC, "Temperature setpoint")
-	field(SCAN, "1 second")
-	field(INP, "@$(number)")
+	field(OUT, "@$(number)")
 	field(PREC, "3")
+	field(SCAN,"Passive")
 	field(EGU, "Celsius")
 	field(LINR, "NO CONVERSION")
+	field(PINI, "YES")
 }
+
 
 

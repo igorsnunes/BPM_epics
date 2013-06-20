@@ -1,0 +1,3 @@
+device(ai,INST_IO,devLPCAi,"LPCAi")
+device(bi,INST_IO,devLPCBi,"LPCBi")
+device(bo,INST_IO,devLPCBo,"LPCBo")

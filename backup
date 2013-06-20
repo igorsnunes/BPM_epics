@@ -1,0 +1,13 @@
+record(ao, "BPM:FRONTEND$(number):setpoint:write")
+{
+	field(DTYP, "LPCAo")
+	field(DESC, "Temperature setpoint")
+	field(OUT, "@$(number)")
+	field(PREC, "3")
+	field(RVAL,"2")
+	field(SCAN,"Passive")
+	field(EGU, "Celsius")
+	field(LINR, "NO CONVERSION")
+	field(PINI, "YES")
+}
+device(ao,INST_IO,devLPCAo,"LPCAo")

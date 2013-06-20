@@ -20,6 +20,7 @@ epicsExportRegistrar(connRegister);
 int init_pNode(void){
 	p.first = NULL;
 	printf("init");
+	p.nnode = 0;
 	return 1;
 }
 
@@ -118,8 +119,8 @@ int epics_TCP_connect(int instrument_id, int *sock, int mut){
 		servaddr.sin_family = AF_INET;
 		servaddr.sin_port = htons(LPCPORT);
 		//TODO:implement getting ip from system call using instrument id
-		//servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-		servaddr.sin_addr.s_addr = inet_addr("10.0.17.201");
+		servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+		//servaddr.sin_addr.s_addr = inet_addr("10.0.17.201");
 	
 	
 		if ((sock[0] = socket(AF_INET, SOCK_STREAM, 0)) < 0){
@@ -178,7 +179,7 @@ static int get_bo(int sock, epicsUInt8 **buf, int instrument_id, int variables){
 	int  size, ret_val;
 	size = var_write_command_ask(&ask,1);
 	ask.p[0] = (unsigned char)variables;
-	ask.p[1] = (unsigned char)(*buf)[0];
+	ask.p[1] = (unsigned char)*buf[0];
 	
 	ret_val = comm_talk(sock,ask,size,&answer,instrument_id);
 	return ret_val;
@@ -187,12 +188,21 @@ static int get_bo(int sock, epicsUInt8 **buf, int instrument_id, int variables){
 static int get_ao(int sock, epicsUInt8 **buf, int instrument_id, int variables){
 	command_header ask,answer;
 	int  size, ret_val;
+	printf("passei2\n");
 	size = var_write_command_ask(&ask,4);
+	
+	printf("variables %d\n", variables);
+	printf("passei3\n");
 	ask.p[0] = (unsigned char)variables;
-	ask.p[1] = (unsigned char)(*buf)[0];
-	ask.p[2] = (unsigned char)(*buf)[1];
-	ask.p[3] = (unsigned char)(*buf)[2];
-	ask.p[4] = (unsigned char)(*buf)[3];
+	printf("passei7\n");
+	ask.p[1] = (unsigned char)*buf[0];
+	ask.p[2] = (unsigned char)*buf[1];
+	printf("passei8\n");
+	ask.p[4] = (unsigned char)*buf[2];
+	printf("passei9\n");
+	//ask.p[4] = (unsigned char)*buf[3];
+	
+	printf("passei4\n");
 	ret_val = comm_talk(sock,ask,size,&answer,instrument_id);
 	return ret_val;
 }

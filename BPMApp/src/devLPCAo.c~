@@ -55,7 +55,6 @@ static long init_record_ao(aoRecord *pao){
 	
 	printf("instrument_id: %d\n",instrument_id);
 	
-	priv->instr_id = instrument_id;
 	if (epics_TCP_connect(instrument_id,&sock,1)==0){
 		priv->status = 0;
 		pao->dpvt = priv;
@@ -65,13 +64,14 @@ static long init_record_ao(aoRecord *pao){
 		priv->status = 1;
 		priv->sock = sock; 
 	}
+	priv->instr_id = instrument_id;
 	pao->dpvt = priv;
 	return 0;
 }
 
 static long write_ao(aoRecord *pao){
 	struct LPCState *priv = pao->dpvt;
-	//epicsUInt32 value = pao->rval;
+	epicsUInt32 value = pao->rval;
 	u rval;
 	int i;
 	epicsUInt8 *buff = NULL;
@@ -79,8 +79,16 @@ static long write_ao(aoRecord *pao){
 		buff = (epicsUInt8*)malloc(sizeof(epicsUInt8)*4);
 		if(!buff)
 			return S_db_noMemory;
-		rval.f = pao->rval;
-		memcpy(buff,&rval.c,4);
+		//rval.f = pao->rval;
+		//memcpy(buff,rval.c,4);
+		for(i = 4;i;i--){
+			buff[i-1] = value & 0xFF;
+			value = value >> 8;
+		}
+		for(i = 4;i;i--)
+			printf(" %x ", buf[i-1]);
+		printf("\n");
+		printf("value:%f, pao->rval: %f\n", rval.f, pao->rval);
 		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,1,OP_WRITE_AO);
 	
 		if (buff)

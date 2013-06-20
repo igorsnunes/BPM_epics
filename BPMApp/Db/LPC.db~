@@ -24,17 +24,6 @@ record(ai, "BPM:FRONTEND$(number):setpoint:read")
 	field(EGU, "Celsius")
 	field(LINR, "NO CONVERSION")
 }
-record(ao, "BPM:FRONTEND$(number):setpoint:write")
-{
-	field(DTYP, "LPCAo")
-	field(DESC, "Temperature setpoint")
-	field(OUT, "@$(number)")
-	field(PREC, "3")
-	field(SCAN,"Passive")
-	field(EGU, "Celsius")
-	field(LINR, "NO CONVERSION")
-	field(PINI, "YES")
-}
 
 
 
