@@ -157,6 +157,7 @@ epicsShareExtern dset *pvar_dset_devLoSoft;
 epicsShareExtern dset *pvar_dset_devLoSoftCallback;
 epicsShareExtern dset *pvar_dset_devMbbiSoft;
 epicsShareExtern dset *pvar_dset_devMbbiSoftRaw;
+epicsShareExtern dset *pvar_dset_devLPCMbbi;
 epicsShareExtern dset *pvar_dset_devMbbiDirectSoft;
 epicsShareExtern dset *pvar_dset_devMbbiDirectSoftRaw;
 epicsShareExtern dset *pvar_dset_devMbboSoft;
@@ -174,7 +175,7 @@ epicsShareExtern dset *pvar_dset_devSoStdio;
 epicsShareExtern dset *pvar_dset_devSASoft;
 epicsShareExtern dset *pvar_dset_devWfSoft;
 
-static const char * const deviceSupportNames[44] = {
+static const char * const deviceSupportNames[45] = {
     "devAaiSoft",
     "devAaoSoft",
     "devAiSoft",
@@ -203,6 +204,7 @@ static const char * const deviceSupportNames[44] = {
     "devLoSoftCallback",
     "devMbbiSoft",
     "devMbbiSoftRaw",
+    "devLPCMbbi",
     "devMbbiDirectSoft",
     "devMbbiDirectSoftRaw",
     "devMbboSoft",
@@ -221,7 +223,7 @@ static const char * const deviceSupportNames[44] = {
     "devWfSoft"
 };
 
-static const dset * const devsl[44] = {
+static const dset * const devsl[45] = {
     pvar_dset_devAaiSoft,
     pvar_dset_devAaoSoft,
     pvar_dset_devAiSoft,
@@ -250,6 +252,7 @@ static const dset * const devsl[44] = {
     pvar_dset_devLoSoftCallback,
     pvar_dset_devMbbiSoft,
     pvar_dset_devMbbiSoftRaw,
+    pvar_dset_devLPCMbbi,
     pvar_dset_devMbbiDirectSoft,
     pvar_dset_devMbbiDirectSoftRaw,
     pvar_dset_devMbboSoft,
@@ -298,7 +301,7 @@ int BPM_registerRecordDeviceDriver(DBBASE *pbase)
     }
 
     registerRecordTypes(pbase, 28, recordTypeNames, rtl);
-    registerDevices(pbase, 44, deviceSupportNames, devsl);
+    registerDevices(pbase, 45, deviceSupportNames, devsl);
     (*pvar_func_asSub)();
     (*pvar_func_connRegister)();
     iocshRegisterVariable(vardefs);

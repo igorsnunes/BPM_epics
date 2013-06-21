@@ -39,7 +39,8 @@ enum operation {
 	OP_READ_BI,
 	OP_READ_AI,
 	OP_WRITE_BO,
-	OP_WRITE_AO
+	OP_WRITE_AO,
+	OP_READ_MBBI
 };
 
 int init_pNode(void);

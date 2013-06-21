@@ -82,3 +82,17 @@ record(ai, "BPM:FRONTEND$(number):temperature4")
 	field(LINR, "NO CONVERSION")
 	field(PINI, "YES")
 }
+record(mbbi, "BPM:FRONTEND$(number):channel1:switchstate:read){
+	field(DTYP, "LPCMbbi")
+	field(DESC, "Switch state")
+	field(INP, "@$(number).$(variableID=6)")
+	field(NOBT,"2")
+	field(ZRVL,"0")
+	field(ONVL,"1")
+	field(TWVL,"2")
+	field(THVL,"3")
+	field(ZRST,"DIRECT")
+	field(ONST,"INVERT")
+	field(TWST,"MATCHED")
+	field(THST,"SWITCHING")
+}

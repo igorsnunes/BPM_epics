@@ -29,6 +29,7 @@ BPM_SRCS += devLPCAi.c
 BPM_SRCS += devLPCAo.c
 BPM_SRCS += devLPCBi.c
 BPM_SRCS += devLPCBo.c
+BPM_SRCS += devLPCMbbi.c
 BPM_SRCS += epicsTCP.c
 #BPM_SRCS += pcbnAPI.c
 

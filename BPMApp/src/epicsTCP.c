@@ -156,7 +156,7 @@ static int comm_talk(int sock,command_header ask,int size, command_header *answe
 }
 
 //get message from server
-static int get_bi_ai(int sock, epicsUInt8 **buf, int instrument_id, int variable){
+static int get_read(int sock, epicsUInt8 **buf, int instrument_id, int variable){
 	command_header ask,answer;
 	int size,ret_val;
 	size = var_read_command_ask(&ask);	
@@ -197,10 +197,13 @@ static int get_operation(int sock, epicsUInt8 **buf, int instrument_id, int vari
 	
 	switch(op){
 		case OP_READ_BI:
-			return get_bi_ai(sock,buf,instrument_id,variable);
+			return get_read(sock,buf,instrument_id,variable);
 			break;
 		case OP_READ_AI:
-			return get_bi_ai(sock,buf,instrument_id,variable);
+			return get_read(sock,buf,instrument_id,variable);
+			break;
+		case OP_READ_MBBI:
+			return get_read(sock,buf,instrument_id,variable);
 			break;
 		case OP_WRITE_BO:
 			return get_bo(sock,buf,instrument_id,variable);	
