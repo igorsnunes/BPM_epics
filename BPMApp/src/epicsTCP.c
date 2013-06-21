@@ -19,7 +19,6 @@ epicsExportRegistrar(connRegister);
 
 int init_pNode(void){
 	p.first = NULL;
-	printf("init");
 	return 1;
 }
 
@@ -43,7 +42,6 @@ static int check_status_ok(int sock,epicsMutexId mutex){
 		ret_val=0;
 	}
 
-	printf("answer: %d %d\n",cmmd.command,cmmd.size);
 	if (cmmd_answer.command != cmmd.command){
 		perror("check_status_ok: wrong answer");
 		ret_val=0;
@@ -88,7 +86,6 @@ static epicsMutexId get_mutex(int instrument_id){
 	Node *aux = p.first;
 
 	while(aux != NULL){
-		printf("%d == %d\n", instrument_id,aux->device_id);
 		if(instrument_id == aux->device_id)
 			break;
 		aux = aux->next;
@@ -105,7 +102,6 @@ int epics_TCP_connect(int instrument_id, int *sock, int mut){
 	mutListMng = epicsMutexCreate();
 	auxsock = get_sock(instrument_id);
 	if (auxsock != -1){
-		printf("sock got\n");
 		sock[0] = auxsock;
 		mutr = get_mutex(instrument_id);
 		if (check_status_ok(sock[0],mutr)==0){

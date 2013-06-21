@@ -19,6 +19,7 @@ static long read_ai(aiRecord *record);
 struct LPCState {
 	int status;
 	int sock;
+	int variable;
 	unsigned long instr_id;
 };
 
@@ -42,27 +43,27 @@ epicsExportAddress(dset, devLPCAi);
 
 static long init_record_ai(aiRecord *pao){
 	int sock = 0;
+	int variable;
 	struct LPCState *priv;
 	priv=malloc(sizeof (*priv) );
 	if(!priv)
 		return S_db_noMemory;
 
 	int instrument_id;
-	if(sscanf(pao->inp.value.instio.string, "%d", &instrument_id)!=1)
+	if(sscanf(pao->inp.value.instio.string, "%d.%d", &instrument_id,&variable)!=2)
 		return S_db_errArg;
 	
-	printf("instrument_id: %d\n",instrument_id);
+	priv->instr_id = instrument_id;
+	priv->variable = variable;
 	
 	if (epics_TCP_connect(instrument_id,&sock,1)==0){
 		priv->status = 0;
 		pao->dpvt = priv;
 		return S_dev_noDeviceFound;
 	}else {
-		printf("sock: %d\n",sock);
 		priv->status = 1;
 		priv->sock = sock; 
 	}
-	priv->instr_id = instrument_id;
 	pao->dpvt = priv;
 	return 0;
 }
@@ -72,15 +73,12 @@ static long read_ai(aiRecord *pao){
 	u rval;
 	epicsUInt8 *buff = NULL;
 	if (priv->status){
-		printf("before do\n");
-		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,1,OP_READ_AI);
-		printf("after do\n");
+		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,priv->variable,OP_READ_AI);
 		if (priv->status){
 			rval.c[0] = buff[0];
 			rval.c[1] = buff[1];
 			rval.c[2] = buff[2];
 			rval.c[3] = buff[3];
-			printf("float value:%f\n", rval.f);
 			pao->rval = rval.f;
 		}
 		if (buff)
