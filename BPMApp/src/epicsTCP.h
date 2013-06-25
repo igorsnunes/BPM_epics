@@ -30,6 +30,13 @@ typedef struct node{
 	struct node *next;
 }Node;
 
+enum ListOperation {
+	GET_MUTEX,
+	GET_SOCK,
+	CREATE_NODE,
+	REMOVE_NODE
+};
+
 typedef struct pnode{
 	int nnode;
 	struct node *first;
@@ -40,9 +47,10 @@ enum operation {
 	OP_READ_AI,
 	OP_WRITE_BO,
 	OP_WRITE_AO,
-	OP_READ_MBBI
+	OP_READ_MBBI,
+	OP_WRITE_MBBO
 };
 
 int init_pNode(void);
 int epics_TCP_connect(int instrument_id, int *sock,int mut);
-int epics_TCP_do(int sock, epicsUInt8 **buf, int instrument_id, int variable, enum operation op);
+int epics_TCP_do(int sock, epicsUInt8 **buf, int instrument_id, int variable, enum operation op,int numbytes);

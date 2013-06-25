@@ -20,6 +20,7 @@ struct LPCState {
 	int status;
 	int sock;
 	int variable;
+	int numbytes;
 	unsigned long instr_id;
 };
 
@@ -44,17 +45,19 @@ epicsExportAddress(dset, devLPCAi);
 static long init_record_ai(aiRecord *pao){
 	int sock = 0;
 	int variable;
+	int numbytes;
 	struct LPCState *priv;
 	priv=malloc(sizeof (*priv) );
 	if(!priv)
 		return S_db_noMemory;
 
 	int instrument_id;
-	if(sscanf(pao->inp.value.instio.string, "%d.%d", &instrument_id,&variable)!=2)
+	if(sscanf(pao->inp.value.instio.string, "%d.%d.%d", &instrument_id,&variable,&numbytes)!=3)
 		return S_db_errArg;
 	
 	priv->instr_id = instrument_id;
 	priv->variable = variable;
+	priv->numbytes = numbytes;
 	
 	if (epics_TCP_connect(instrument_id,&sock,1)==0){
 		priv->status = 0;
@@ -73,12 +76,9 @@ static long read_ai(aiRecord *pao){
 	u rval;
 	epicsUInt8 *buff = NULL;
 	if (priv->status){
-		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,priv->variable,OP_READ_AI);
+		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,priv->variable,OP_READ_AI,priv->numbytes);
 		if (priv->status){
-			rval.c[0] = buff[0];
-			rval.c[1] = buff[1];
-			rval.c[2] = buff[2];
-			rval.c[3] = buff[3];
+			memcpy(&rval.c,buff,priv->numbytes);
 			pao->rval = rval.f;
 		}
 		if (buff)

@@ -4,17 +4,16 @@
 #include <dbAccess.h>
 #include <devSup.h>
 #include <recGbl.h>
-#include <aoRecord.h>
+#include <mbboRecord.h>
 #include <stdlib.h>
 #include "epicsTCP.h"
 
 typedef union {
 	epicsUInt8 c[4];
-	float f;
+	unsigned long f;
 } u;
-	
-static long init_record_ao(aoRecord *record);
-static long write_ao(aoRecord *record);
+static long init_record_mbbo(mbboRecord *record);
+static long write_mbbo(mbboRecord *record);
 
 struct LPCState {
 	int status;
@@ -28,23 +27,20 @@ struct {
 	long num;
 	DEVSUPFUN report;
 	DEVSUPFUN init;
-	DEVSUPFUN init_record_ao;
+	DEVSUPFUN init_record;
 	DEVSUPFUN get_ioint_info;
-	DEVSUPFUN write_ao;
-	DEVSUPFUN special_linconv;
-} devLPCAo = {
-	6,
-	//5,
+	DEVSUPFUN write_mbbo;
+} devLPCMbbo = {
+	5,
 	NULL,
 	NULL,
-	init_record_ao,
+	init_record_mbbo,
 	NULL,
-	write_ao,
-	NULL
+	write_mbbo,
 };
-epicsExportAddress(dset, devLPCAo);
+epicsExportAddress(dset,devLPCMbbo);
 
-static long init_record_ao(aoRecord *pao){
+static long init_record_mbbo(mbboRecord *pao){
 	int sock = 0;
 	int variable;
 	int numbytes;
@@ -59,8 +55,8 @@ static long init_record_ao(aoRecord *pao){
 	
 	priv->instr_id = instrument_id;
 	priv->variable = variable;
-	priv->numbytes = numbytes;
-	
+	priv->numbytes = numbytes;	
+
 	if (epics_TCP_connect(instrument_id,&sock,1)==0){
 		priv->status = 0;
 		pao->dpvt = priv;
@@ -69,27 +65,26 @@ static long init_record_ao(aoRecord *pao){
 		priv->status = 1;
 		priv->sock = sock; 
 	}
+
 	pao->dpvt = priv;
 	return 0;
 }
 
-static long write_ao(aoRecord *pao){
+static long write_mbbo(mbboRecord *pao){
 	struct LPCState *priv = pao->dpvt;
+	epicsUInt8 *buf = NULL;
 	u rval;
-	int i;
-	epicsUInt8 *buff = NULL;
 	if (priv->status){
-		buff = (epicsUInt8*)malloc(sizeof(epicsUInt8)*priv->numbytes);
-		if(!buff)
+		buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*priv->numbytes);
+		if (!buf)
 			return S_db_noMemory;
 		rval.f = pao->rval;
-		memcpy(buff,&rval.c,priv->numbytes);
-		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,priv->variable,OP_WRITE_AO,priv->numbytes);
-	
-		if (buff)
-			free(buff);
-	}
-	 else
+		memcpy(buf,&rval.c,priv->numbytes);
+		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,priv->variable,OP_WRITE_MBBO,((pao->nobt/8)+1));
+		
+		if (buf)//TODO: check it!
+			free(buf);
+	} else
 		priv->status = epics_TCP_connect(priv->instr_id,&priv->sock,0);
 
 	return 0;

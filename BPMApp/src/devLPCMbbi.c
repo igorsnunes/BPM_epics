@@ -11,8 +11,8 @@
 
 typedef union {
 	epicsUInt8 c[4];
-	unsigned long ul;
-} unsigned_long_union;
+	unsigned long f;
+} u;
 
 
 static long init_record_mbbi(mbbiRecord *record);
@@ -22,6 +22,7 @@ struct LPCState {
 	int status;
 	int sock;
 	int variable;
+	int numbytes;
 	unsigned long instr_id;
 };
 
@@ -45,18 +46,20 @@ epicsExportAddress(dset,devLPCMbbi);
 static long init_record_mbbi(mbbiRecord *pao){
 	int variable;
 	int sock = 0;
+	int numbytes;
 	struct LPCState *priv;
 	priv=malloc(sizeof (*priv) );
 	if(!priv)
 		return S_db_noMemory;
 
-	int instrument_id;
-	
-	if(sscanf(pao->inp.value.instio.string, "%d.%d", &instrument_id,&variable)!=2)
+	int instrument_id;	
+
+	if(sscanf(pao->inp.value.instio.string, "%d.%d.%d", &instrument_id,&variable,&numbytes)!=3)
 		return S_db_errArg;
 	
 	priv->instr_id = instrument_id;
 	priv->variable = variable;
+	priv->numbytes = numbytes;
 
 	if (epics_TCP_connect(instrument_id,&sock,1)==0){
 		priv->status = 0;
@@ -74,13 +77,14 @@ static long init_record_mbbi(mbbiRecord *pao){
 static long read_mbbi(mbbiRecord *pao){
 	struct LPCState *priv = pao->dpvt;
 	epicsUInt8 *buf = NULL;
-	unsigned_long_union rval;
+	int i;
+	u rval;
 	memset(rval.c,0,4);
 	if (priv->status){
-		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,priv->variable,OP_READ_MBBI);
+		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,priv->variable,OP_READ_MBBI,((pao->nobt/8)+1));
 		memcpy(&rval.c,buf,((pao->nobt/8)+1));
 		if (priv->status){
-			pao->rval = rval.ul;
+			pao->rval = rval.f;
 		}
 		if (buf)
 			free(buf);
