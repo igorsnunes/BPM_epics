@@ -75,13 +75,12 @@ static long write_mbbo(mbboRecord *pao){
 	epicsUInt8 *buf = NULL;
 	u rval;
 	if (priv->status){
-		buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*priv->numbytes);
+		buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*((pao->nobt/8)+1));
 		if (!buf)
 			return S_db_noMemory;
 		rval.f = pao->rval;
-		memcpy(buf,&rval.c,priv->numbytes);
+		memcpy(buf,&rval.c,((pao->nobt/8)+1));
 		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,priv->variable,OP_WRITE_MBBO,((pao->nobt/8)+1));
-		
 		if (buf)//TODO: check it!
 			free(buf);
 	} else

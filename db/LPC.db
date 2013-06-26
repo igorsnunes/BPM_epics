@@ -97,3 +97,18 @@ record(mbbi, "BPM:FRONTEND$(number):channel1:switchState:read"){
 	field(TWST,"MATCHED")
 	field(THST,"SWITCHING")
 }
+record(mbbo, "BPM:FRONTEND$(number):channel1:switchState:write"){
+	field(DTYP, "LPCMbbo")
+	field(DESC, "Switch state")
+	field(OUT, "@$(number).$(variableID=0).$(nbytes=1)")
+	field(SCAN,"Passive")
+	field(NOBT,"2")
+	field(ZRVL,"0")
+	field(ONVL,"1")
+	field(TWVL,"2")
+	field(THVL,"3")
+	field(ZRST,"DIRECT")
+	field(ONST,"INVERT")
+	field(TWST,"MATCHED")
+	field(THST,"SWITCHING")
+}

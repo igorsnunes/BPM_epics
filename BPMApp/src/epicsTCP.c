@@ -231,6 +231,8 @@ static int get_operation(int sock, epicsUInt8 **buf, int instrument_id, int vari
 			break;
 		case OP_READ_MBBI:
 			return get_read(sock,buf,instrument_id,variable,numbytes);
+		case OP_WRITE_MBBO:
+			return get_write(sock,buf,instrument_id,variable,numbytes);	
 			break;
 		case OP_WRITE_BO:
 			return get_write(sock,buf,instrument_id,variable,numbytes);	
