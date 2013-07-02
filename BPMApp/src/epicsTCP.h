@@ -52,5 +52,5 @@ enum operation {
 };
 
 int init_pNode(void);
-int epics_TCP_connect(int instrument_id, int *sock,int mut);
-int epics_TCP_do(int sock, epicsUInt8 **buf, int instrument_id, int variable, enum operation op,int numbytes);
+int epics_TCP_connect(int instrument_id);
+int epics_TCP_do(epicsUInt8 **buf, int instrument_id, int variable, enum operation op,int numbytes);

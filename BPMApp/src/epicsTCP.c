@@ -1,10 +1,22 @@
 #include "epicsTCP.h"
 
+static char ipTable[50][18];
 static pNode p;
 static epicsMutexId mutListMng;
 int init_pNode(void);
+int get_ips(char *ip, char *id);
+
+static const iocshArg get_ipsArg0 = { "ip", iocshArgString };
+static const iocshArg get_ipsArg1 = { "id", iocshArgString };
+
+static const iocshArg * const get_ipsArgs[] = { &get_ipsArg0,&get_ipsArg1 };
 
 static const iocshFuncDef init_pNodeDef = {"init_pNode",0,NULL};
+static const iocshFuncDef get_ipsDef = {"get_ips",2,get_ipsArgs};
+
+static void get_ipsFunc(const iocshArgBuf *args){
+	get_ips(args[0].sval,args[1].sval);
+}
 
 static void init_pNodeFunc (const iocshArgBuf *args){
 	init_pNode();
@@ -12,6 +24,7 @@ static void init_pNodeFunc (const iocshArgBuf *args){
 
 static void connRegister(void){
 	iocshRegister(&init_pNodeDef,init_pNodeFunc);
+	iocshRegister(&get_ipsDef,get_ipsFunc);
 }
 
 epicsExportRegistrar(connRegister);
@@ -23,6 +36,11 @@ int init_pNode(void){
 	return 1;
 }
 
+int get_ips(char *id,char *ip){
+	int idint = atoi(id);
+	sprintf(ipTable[idint],"%s",ip);
+	return 1;
+}
 
 static Node* create_Node(int device_id, int sock){
 	Node *aux,*last;
@@ -45,20 +63,31 @@ static Node* create_Node(int device_id, int sock){
 }
 static void close_connection(int instrument_id){
 	int socket = -1;
+	if(p.first == NULL)
+		return;
+	p.nnode--;
+
 	Node *aux = p.first,*prev = aux;
-	//TODO: RACE CONDITION!!!
-	while(aux != NULL){
-		if (aux->device_id == instrument_id){
-			socket = aux->sock;
-			prev->next = aux->next;
-			free(aux);
-			break;
-		}
-		prev = aux;
-		aux = aux->next;
-	}
-	if(socket != -1)
+	if (p.first->next == NULL && p.first->device_id == instrument_id){
+		socket = p.first->sock;
 		close(socket);
+		free(p.first);
+		p.first = NULL;	
+	}
+	else{
+		while(aux != NULL){
+			if (aux->device_id == instrument_id){
+				socket = aux->sock;
+				close(socket);
+				prev->next = aux->next;
+				free(aux);
+				break;
+			}
+			prev = aux;
+			aux = aux->next;
+		}
+	}
+	
 	return;
 }
 
@@ -72,22 +101,31 @@ static int get_sock(int instrument_id){
 	return -1;
 }
 
-static epicsMutexId get_mutex(int instrument_id){
+static epicsMutexId get_mutex(int instrument_id,int *found){
 	Node *aux = p.first;
+	if(aux == NULL){
+		found[0] = 0;
+		return NULL;
+	}
 
 	while(aux != NULL){
-		if(instrument_id == aux->device_id)
+		if(instrument_id == aux->device_id){
+			found[0] = 1;
+			return aux->mutex;
 			break;
+		}
 		aux = aux->next;
 	}
-	return aux->mutex;
+	found[0] = 0;
+	return NULL;
 }
 
-static void list_operation(enum ListOperation op, epicsMutexId *mut, int *sock, Node **node, int instrument_id){
+static int list_operation(enum ListOperation op, epicsMutexId *mut, int *sock, Node **node, int instrument_id){
 	epicsMutexLock(mutListMng);
+	int ret_val = 0;
 	switch (op){
 		case GET_MUTEX:
-			mut[0] = get_mutex(instrument_id);
+			mut[0] = get_mutex(instrument_id,&ret_val);
 			break;
 		case GET_SOCK:
 			sock[0] = get_sock(instrument_id);
@@ -100,7 +138,7 @@ static void list_operation(enum ListOperation op, epicsMutexId *mut, int *sock, 
 			break;
 	}
 	epicsMutexUnlock(mutListMng);
-	return;
+	return ret_val;
 }
 
 static int check_status_ok(int sock,epicsMutexId mutex){
@@ -130,41 +168,51 @@ static int check_status_ok(int sock,epicsMutexId mutex){
 }
 
 //estabilish connection with ethernet device
-int epics_TCP_connect(int instrument_id, int *sock, int mut){
+int epics_TCP_connect(int instrument_id){
 	struct sockaddr_in servaddr;
-	int auxsock;
+	struct timeval timeout;
+	int sock;
 	Node *last = NULL;
 	epicsMutexId mutr;
-	list_operation(GET_SOCK,NULL,&auxsock,NULL,instrument_id);
-	printf("%d %d \n",auxsock,instrument_id);
-	if (auxsock != -1){
-		sock[0] = auxsock;
+	list_operation(GET_SOCK,NULL,&sock,NULL,instrument_id);
+	printf("%d %d \n",sock,instrument_id);
+	if (sock != -1){
 		list_operation(GET_MUTEX, &mutr, NULL, NULL,instrument_id);
-		if (check_status_ok(sock[0],mutr)==0){
+		if (check_status_ok(sock,mutr)==0){
 			printf("Device status: not OK!\n");
 			return 0;
 		}
 
 	}
 	else{
+		timeout.tv_sec = 5;
+		timeout.tv_usec = 5;
 		memset(&servaddr, 0, sizeof(servaddr));
 		servaddr.sin_family = AF_INET;
 		servaddr.sin_port = htons(LPCPORT);
 		//TODO:implement getting ip from system call using instrument id
 		//servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-		servaddr.sin_addr.s_addr = inet_addr("10.0.17.201");
+		servaddr.sin_addr.s_addr = inet_addr(ipTable[instrument_id]);
 	
-		if ((sock[0] = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+		if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 			perror("epics_TCP_connect:socket failed");
 			return 0;
 		}
-		if (connect(sock[0], (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0){
+
+		//if(setsockopt (sock,SOL_SOCKET,SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
+			//perror("setsockopt failed\n");
+
+		//if(setsockopt (sock,SOL_SOCKET,SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
+			//perror("setsockopt failed\n");
+
+		if (connect(sock, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0){
 			perror("epics_TCP_connect:connection failed\n");
 			return 0;
 		}
-		list_operation(CREATE_NODE, NULL, sock, &last,instrument_id);
-		if (check_status_ok(sock[0],last->mutex)==0){
+		list_operation(CREATE_NODE, NULL, &sock, &last,instrument_id);
+		if (check_status_ok(last->sock,last->mutex)==0){
 			printf("Device status: not OK!\n");
+			list_operation(REMOVE_NODE,NULL,NULL,NULL,instrument_id);
 			return 0;
 		}
 	}
@@ -172,11 +220,28 @@ int epics_TCP_connect(int instrument_id, int *sock, int mut){
 	return 1;
 }
 
-static int comm_talk(int sock,command_header ask,int size, command_header *answer, int instrument_id){
+static int comm_talk(command_header ask,int size, command_header *answer, int instrument_id){
 	int ret_val = 1;
+	int sock;
 	epicsMutexId mutex;
-	list_operation(GET_MUTEX, &mutex, NULL, NULL,instrument_id);
+
+	list_operation(GET_SOCK,NULL,&sock,NULL,instrument_id);
+	if(sock == -1){
+		perror("Device disconnected");
+		return 0;
+	}
+	
+	int list_ret = list_operation(GET_MUTEX, &mutex, NULL, NULL,instrument_id);
+	if(list_ret == 0){
+		perror("No device found");
+		return 0;
+	}
+	
+	printf("sock %d, list_ret %d \n",sock,list_ret);
+	
 	epicsMutexLock(mutex);
+	
+	printf("sock %d",sock);
 	if(send(sock, &ask, size, 0)<=0){
 		perror("epics_TCP_get:message not sent");
 		ret_val=0;
@@ -185,28 +250,31 @@ static int comm_talk(int sock,command_header ask,int size, command_header *answe
 		perror("epics_TCP_get:message not recv");
 		ret_val=0;
 	}
+	printf("sock %d\n",sock);
 	epicsMutexUnlock(mutex);
-	printf("message received:%d %d %d\n",answer->command,answer->size,answer->p[0]);
+	if (ret_val)
+		printf("message received:%d %d %d\n",answer->command,answer->size,answer->p[0]);
 	return ret_val;
 }
 	
 //get message from server
-static int get_read(int sock, epicsUInt8 **buf, int instrument_id, int variable, int numbytes){
+static int get_read(epicsUInt8 **buf, int instrument_id, int variable, int numbytes){
 	command_header ask,answer;
 	int size,ret_val;
 	size = var_read_command_ask(&ask);	
 	ask.p[0] = (unsigned char)variable;
-	ret_val = comm_talk(sock,ask,size,&answer,instrument_id);
-	
-	*buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*numbytes);
-	memcpy(*buf,answer.p,numbytes);
+	ret_val = comm_talk(ask,size,&answer,instrument_id);
+	if (ret_val){
+		*buf = (epicsUInt8*)malloc(sizeof(epicsUInt8)*numbytes);
+		memcpy(*buf,answer.p,numbytes);
+	}
 	if (!ret_val)
 		list_operation(REMOVE_NODE,NULL,NULL,NULL,instrument_id);
 	
 	return ret_val;
 }
 
-static int get_write(int sock, epicsUInt8 **buf, int instrument_id, int variables, int numbytes){
+static int get_write(epicsUInt8 **buf, int instrument_id, int variables, int numbytes){
 	command_header ask,answer;
 	int  size, ret_val,i;
 	size = var_write_command_ask(&ask,numbytes);
@@ -214,38 +282,39 @@ static int get_write(int sock, epicsUInt8 **buf, int instrument_id, int variable
 	for(i=0;i<numbytes;i++)
 		ask.p[i+1] = (unsigned char)(*buf)[i];
 	
-	ret_val = comm_talk(sock,ask,size,&answer,instrument_id);
+	ret_val = comm_talk(ask,size,&answer,instrument_id);
 	if (!ret_val)
 		list_operation(REMOVE_NODE,NULL,NULL,NULL,instrument_id);
 	return ret_val;
 }
 
-static int get_operation(int sock, epicsUInt8 **buf, int instrument_id, int variable,enum operation op,int numbytes){
+static int get_operation(epicsUInt8 **buf, int instrument_id, int variable,enum operation op,int numbytes){
 	
 	switch(op){
 		case OP_READ_BI:
-			return get_read(sock,buf,instrument_id,variable,numbytes);
+			return get_read(buf,instrument_id,variable,numbytes);
 			break;
 		case OP_READ_AI:
-			return get_read(sock,buf,instrument_id,variable,numbytes);
+			return get_read(buf,instrument_id,variable,numbytes);
 			break;
 		case OP_READ_MBBI:
-			return get_read(sock,buf,instrument_id,variable,numbytes);
+			return get_read(buf,instrument_id,variable,numbytes);
+			break;
 		case OP_WRITE_MBBO:
-			return get_write(sock,buf,instrument_id,variable,numbytes);	
+			return get_write(buf,instrument_id,variable,numbytes);	
 			break;
 		case OP_WRITE_BO:
-			return get_write(sock,buf,instrument_id,variable,numbytes);	
+			return get_write(buf,instrument_id,variable,numbytes);	
 			break;
 		case OP_WRITE_AO:
-			return get_write(sock,buf,instrument_id,variable,numbytes);	
+			return get_write(buf,instrument_id,variable,numbytes);	
 			break;
 	}
 	return 0;
 }
 
 //multiplex right operation
-int epics_TCP_do(int sock, epicsUInt8 **buf, int instrument_id, int variable, enum operation op, int numbytes){
+int epics_TCP_do(epicsUInt8 **buf, int instrument_id, int variable, enum operation op, int numbytes){
 
-	return get_operation(sock,buf,instrument_id,variable,op,numbytes);
+	return get_operation(buf,instrument_id,variable,op,numbytes);
 }

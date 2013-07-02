@@ -59,10 +59,9 @@ static long init_record_bi(biRecord *pao){
 	priv->variable = variable;
 	priv->numbytes = numbytes;
 
-	if (epics_TCP_connect(instrument_id,&sock,1)==0){
+	if (epics_TCP_connect(instrument_id)==0){
 		priv->status = 0;
 		pao->dpvt = priv;
-		return S_dev_noDeviceFound;
 	}else {
 		priv->status = 1;
 		priv->sock = sock; 
@@ -77,15 +76,14 @@ static long read_bi(biRecord *pao){
 	u rval;
 	epicsUInt8 *buf = NULL;
 	if (priv->status){
-		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,priv->variable,OP_READ_BI,priv->numbytes);
+		priv->status = epics_TCP_do(&buf,priv->instr_id,priv->variable,OP_READ_BI,priv->numbytes);
 		if (priv->status){
 			memcpy(&rval.c,buf,priv->numbytes);
-		pao->rval = rval.f;
-		}
-		if (buf)
+			pao->rval = rval.f;
 			free(buf);
+		}
 	} else
-		priv->status = epics_TCP_connect(priv->instr_id,&priv->sock,0);
+		priv->status = epics_TCP_connect(priv->instr_id);
 
 	return 0;
 }

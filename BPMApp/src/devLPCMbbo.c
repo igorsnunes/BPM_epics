@@ -57,10 +57,9 @@ static long init_record_mbbo(mbboRecord *pao){
 	priv->variable = variable;
 	priv->numbytes = numbytes;	
 
-	if (epics_TCP_connect(instrument_id,&sock,1)==0){
+	if (epics_TCP_connect(instrument_id)==0){
 		priv->status = 0;
 		pao->dpvt = priv;
-		return S_dev_noDeviceFound;
 	}else {
 		priv->status = 1;
 		priv->sock = sock; 
@@ -80,11 +79,11 @@ static long write_mbbo(mbboRecord *pao){
 			return S_db_noMemory;
 		rval.f = pao->rval;
 		memcpy(buf,&rval.c,((pao->nobt/8)+1));
-		priv->status = epics_TCP_do(priv->sock,&buf,priv->instr_id,priv->variable,OP_WRITE_MBBO,((pao->nobt/8)+1));
+		priv->status = epics_TCP_do(&buf,priv->instr_id,priv->variable,OP_WRITE_MBBO,((pao->nobt/8)+1));
 		if (buf)//TODO: check it!
 			free(buf);
 	} else
-		priv->status = epics_TCP_connect(priv->instr_id,&priv->sock,0);
+		priv->status = epics_TCP_connect(priv->instr_id);
 
 	return 0;
 }

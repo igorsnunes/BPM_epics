@@ -59,10 +59,9 @@ static long init_record_ai(aiRecord *pao){
 	priv->variable = variable;
 	priv->numbytes = numbytes;
 	
-	if (epics_TCP_connect(instrument_id,&sock,1)==0){
+	if (epics_TCP_connect(instrument_id)==0){
 		priv->status = 0;
 		pao->dpvt = priv;
-		return S_dev_noDeviceFound;
 	}else {
 		priv->status = 1;
 		priv->sock = sock; 
@@ -76,15 +75,14 @@ static long read_ai(aiRecord *pao){
 	u rval;
 	epicsUInt8 *buff = NULL;
 	if (priv->status){
-		priv->status = epics_TCP_do(priv->sock,&buff,priv->instr_id,priv->variable,OP_READ_AI,priv->numbytes);
+		priv->status = epics_TCP_do(&buff,priv->instr_id,priv->variable,OP_READ_AI,priv->numbytes);
 		if (priv->status){
 			memcpy(&rval.c,buff,priv->numbytes);
 			pao->rval = rval.f;
-		}
-		if (buff)
 			free(buff);
+		}
 	} else
-		priv->status = epics_TCP_connect(priv->instr_id,&priv->sock,0);
+		priv->status = epics_TCP_connect(priv->instr_id);
 
 	return 0;
 }
