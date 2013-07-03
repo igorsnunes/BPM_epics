@@ -223,8 +223,15 @@ int epics_TCP_connect(int instrument_id){
 static int comm_talk(command_header ask,int size, command_header *answer, int instrument_id){
 	int ret_val = 1;
 	int sock;
-	epicsMutexId mutex;
+	fd_set rfds;
+	fd_set wfds;
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
 
+	epicsMutexId mutex;
+	struct timeval timeout;
+	timeout.tv_sec = 5;
+	timeout.tv_usec = 5;
 	list_operation(GET_SOCK,NULL,&sock,NULL,instrument_id);
 	if(sock == -1){
 		perror("Device disconnected");
@@ -241,16 +248,44 @@ static int comm_talk(command_header ask,int size, command_header *answer, int in
 	
 	epicsMutexLock(mutex);
 	
-	printf("sock %d",sock);
-	if(send(sock, &ask, size, 0)<=0){
-		perror("epics_TCP_get:message not sent");
-		ret_val=0;
+	FD_SET(sock, &rfds);
+	FD_SET(sock, &wfds);
+	if(select(sock+1,NULL,&wfds,NULL,&timeout)==-1){
+		perror("select error");
+		ret_val = 0;
 	}
-	if(recv(sock,answer,sizeof(answer),0)<=0){
-		perror("epics_TCP_get:message not recv");
-		ret_val=0;
+	else if(FD_ISSET(sock,&wfds)){
+		if(send(sock, &ask, size, 0)<=0){
+			perror("epics_TCP_get:message not sent");
+			ret_val=0;
+			goto end;
+		}
 	}
-	printf("sock %d\n",sock);
+	else{
+		perror("timeout:send");
+		ret_val = 0;
+		goto end;
+	}
+	
+	if(select(sock+1,&rfds,NULL,NULL,&timeout)==-1){
+		perror("select error");
+		ret_val = 0;
+	}
+	else if(FD_ISSET(sock,&rfds)){
+		if(recv(sock,answer,sizeof(answer),0)<=0){
+			perror("epics_TCP_get:message not recv");
+			ret_val=0;
+			goto end;
+		}
+	}
+	else{
+		perror("timeout:recv");
+		ret_val = 0;
+		goto end;
+	}
+	end:
+	FD_CLR(sock,&wfds);
+	FD_CLR(sock,&rfds);
 	epicsMutexUnlock(mutex);
 	if (ret_val)
 		printf("message received:%d %d %d\n",answer->command,answer->size,answer->p[0]);

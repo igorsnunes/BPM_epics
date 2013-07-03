@@ -14,13 +14,13 @@ BPM_registerRecordDeviceDriver(pdbbase)
 ##initialize primary node
 init_pNode
 ##get ips using device ids
-get_ips("0","127.0.0.1")
-##get_ips("0","10.0.17.201")
-get_ips("1","10.0.17.34")
+##get_ips("0","127.0.0.1")
+get_ips("0","10.0.17.201")
+##get_ips("1","10.0.17.34")
 
 ## Load record instances
 dbLoadRecords("db/LPC.db","user=igorHost,number=0")
-dbLoadRecords("db/LPC.db","user=igorHost,number=1")
+##dbLoadRecords("db/LPC.db","user=igorHost,number=1")
 ##dbLoadRecords("db/LPC.db","user=igorHost,number=2")
 ##dbLoadRecords("db/LPC.db","user=igorHost,number=3")
 ##dbLoadRecords("db/LPC.db","user=igorHost,number=4")
